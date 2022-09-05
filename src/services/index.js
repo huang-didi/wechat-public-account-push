@@ -1,8 +1,9 @@
-import { config } from '../../config/index.js'
-import { CITY_INFO, TYPE_LIST } from '../store/index.js'
+import { config } from '../../config'
+import { CITY_INFO, TYPE_LIST } from '../store'
 import axios from 'axios'
 import dayjs from 'dayjs'
-import { randomNum, sortBirthdayTime } from '../utils/index.js'
+import {getNewDateTwoColoBallData, randomNum, sortBirthdayTime} from '../utils'
+import {getTwoColoBallData} from "../utils";
 
 /**
  * 获取 accessToken
@@ -206,7 +207,7 @@ export const getBirthdayMessage = () => {
       }
 
       // 退伍相关
-      if (item.type === '退伍') {
+      if (item.type === '退伍') {q
         // 获取周岁
         const age = dayjs().diff(item.year + '-' + item.date, 'year')
 
@@ -214,6 +215,13 @@ export const getBirthdayMessage = () => {
           message = `今天是 ${ item.name } 退伍的${ age ? age + '年' : '' }纪念日哦，祝${ item.name }节日快乐！`
         } else {
           message = `今天是 ${ item.name } 退伍的第 ${Math.floor(((new Date().getTime() - new Date(item.year + '-' + item.date)) / 86400000))} 天,祖国有你！`
+        }
+      }
+
+      if(item.type === '双色球') {
+        if(getTwoColoBallData != null){
+          const data = getTwoColoBallData;
+          message = `${data.time} 的双色球开奖号码是 ${data.openCode} ,今日幸运号码为 ${getNewDateTwoColoBallData}, 下一个头等奖就是你！`
         }
       }
 
