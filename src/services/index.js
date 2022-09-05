@@ -205,6 +205,18 @@ export const getBirthdayMessage = () => {
         }
       }
 
+      // 退伍相关
+      if (item.type === '退伍') {
+        // 获取周岁
+        const age = dayjs().diff(item.year + '-' + item.date, 'year')
+
+        if (item.diffDay === 0) {
+          message = `今天是 ${ item.name } 退伍的${ age ? age + '年' : '' }纪念日哦，祝${ item.name }节日快乐！`
+        } else {
+          message = `今天是 ${ item.name } 退伍的第 ${item.differenceInTime} 天,祖国有你！`
+        }
+      }
+
       // 存储数据
       if (message) {
         resMessage += `${ message } \n`
@@ -226,6 +238,7 @@ export const getDateDiffList = () => {
 
   dateList.forEach(item => {
     item['diffDay'] = Math.floor(dayjs().diff(dayjs(item.date), 'day', true))
+    item['differenceInTime'] = Math.floor((new Date().getTime() - new Date(item.date).getTime()) / 86400000)
   })
 
   return dateList
