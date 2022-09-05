@@ -213,7 +213,7 @@ export const getBirthdayMessage = () => {
         if (item.diffDay === 0) {
           message = `今天是 ${ item.name } 退伍的${ age ? age + '年' : '' }纪念日哦，祝${ item.name }节日快乐！`
         } else {
-          message = `今天是 ${ item.name } 退伍的第 ${item.differenceInTime} 天,祖国有你！`
+          message = `今天是 ${ item.name } 退伍的第 ${Math.floor(((new Date().getTime() - new Date(item.year + '-' + item.date)) / 86400000))} 天,祖国有你！`
         }
       }
 
@@ -238,7 +238,6 @@ export const getDateDiffList = () => {
 
   dateList.forEach(item => {
     item['diffDay'] = Math.floor(dayjs().diff(dayjs(item.date), 'day', true))
-    item['differenceInTime'] = Math.floor((new Date().getTime() - new Date(item.date).getTime()) / 86400000)
   })
 
   return dateList
@@ -329,14 +328,14 @@ export const sendMessageReply = async (users, accessToken, templateId = null, pa
   let failPostNum = 0
   const successPostIds = []
   const failPostIds = []
-  users.forEach(async user => {
+  for (const user of users) {
     allPromise.push(sendMessage(
       templateId || user.useTemplateId,
       user,
       accessToken,
       params || user.wxTemplateParams
     ))
-  })
+  }
   const resList = await Promise.all(allPromise)
   resList.forEach(item => {
     if (item.success) {
