@@ -125,9 +125,9 @@ const main = async () => {
   })
 
   // 发送回执
-  if (config.CALLBACK_TEMPLATE_ID) {
+/*  if (config.CALLBACK_TEMPLATE_ID) {
     await sendMessageReply(config.CALLBACK_USERS, accessToken, config.CALLBACK_TEMPLATE_ID, callbackTemplateParams)
-  }
+  }*/
 }
 
 main()

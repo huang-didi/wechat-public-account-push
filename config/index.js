@@ -31,7 +31,7 @@ export const config = {
       // 扫码关注你的微信测试号后生成的一段字符串，在测试号后台能看到
       id: "oNcJj6KtwS063ae6R0jgUzwoNh2o",
       // 你想对他发送的模板消息的模板ID
-      useTemplateId: "FFZBAPO6eqQA2GdArRQ0Zv1BI3AsmwL07NPijLtcbYY",
+      useTemplateId: "plhgYbwswJzUQsC0GrfWluv0rguUfgsUKw0ZnAp0UR8",
       // 所在省份
       province: "湖南",
       // 所在城市

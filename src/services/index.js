@@ -226,7 +226,10 @@ export const getBirthdayMessage = async () => {
                 if (item.diffDay === 0) {
                     message = `今天是 ${item.name} 退伍的${age ? age + '年' : ''}纪念日哦，祝${item.name}节日快乐！`
                 } else {
-                    message = `今天是 ${item.name} 退伍的第 ${Math.floor(((new Date().getTime() - new Date(item.year + '-' + item.date)) / 86400000))} 天,祖国有你！`
+                    // message = `今天是 ${item.name} 退伍的第 ${Math.floor(((new Date().getTime() - new Date(item.year + '-' + item.date)) / 86400000))} 天,祖国有你！`
+                    message = `光荣的退伍军人，您好！
+    今天是您退伍的第 ${Math.floor(((new Date().getTime() - new Date(item.year + '-' + item.date)) / 86400000))}天
+    您守护的不只是山河社稷，更是每个年轻人的未来！`
                 }
             }
 
