@@ -1,36 +1,35 @@
-import { config } from '../../config'
-import { CITY_INFO, TYPE_LIST } from '../store'
+import {config} from '../../config/index.js'
+import {CITY_INFO, TYPE_LIST} from '../store/index.js'
 import axios from 'axios'
 import dayjs from 'dayjs'
-import {getNewDateTwoColoBallData, randomNum, sortBirthdayTime} from '../utils'
-import {getTwoColoBallData} from "../utils";
+import {getNewDateTwoColoBallData, randomNum, sortBirthdayTime, getTwoColoBallData} from '../utils/index.js';
 
 /**
  * 获取 accessToken
  * @returns accessToken
  */
 export const getAccessToken = async () => {
-  // APP_ID
-  const appId = config.APP_ID
-  // APP_SECRET
-  const appSecret = config.APP_SECRET
-  // accessToken
-  let accessToken = null
+    // APP_ID
+    const appId = config.APP_ID
+    // APP_SECRET
+    const appSecret = config.APP_SECRET
+    // accessToken
+    let accessToken = null
 
-  const postUrl = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${ appId }&secret=${ appSecret }`
+    const postUrl = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appId}&secret=${appSecret}`
 
-  try {
-    const res = await axios.get(postUrl)
-    if (res.status === 200 && res.data && res.data.access_token) {
-      accessToken = res.data.access_token
-    } else {
-      console.error('获取 accessToken: 请求失败', res.data.errmsg)
+    try {
+        const res = await axios.get(postUrl)
+        if (res.status === 200 && res.data && res.data.access_token) {
+            accessToken = res.data.access_token
+        } else {
+            console.error('获取 accessToken: 请求失败', res.data.errmsg)
+        }
+    } catch (e) {
+        console.error('获取 accessToken: ', e)
     }
-  } catch (e) {
-    console.error('获取 accessToken: ', e)
-  }
 
-  return accessToken
+    return accessToken
 }
 
 /**
@@ -39,42 +38,42 @@ export const getAccessToken = async () => {
  * @param {*} city 城市
  */
 export const getWeather = async (province, city) => {
-  if (!CITY_INFO[province] || !CITY_INFO[province][city] || !CITY_INFO[province][city]['AREAID']) {
-    console.error('配置文件中找不到相应的省份或城市')
-    return null
-  }
-  const address = CITY_INFO[province][city]['AREAID']
-
-  const url = `http://d1.weather.com.cn/dingzhi/${ address }.html?_=${ dayjs().valueOf() }`
-
-  const res = await axios.get(url, {
-    headers: {
-      'Referer': `http://www.weather.com.cn/weather1d/${ address }.shtml`,
-      'User-Agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36`
+    if (!CITY_INFO[province] || !CITY_INFO[province][city] || !CITY_INFO[province][city]['AREAID']) {
+        console.error('配置文件中找不到相应的省份或城市')
+        return null
     }
-  }).catch(err => err)
+    const address = CITY_INFO[province][city]['AREAID']
 
-  try {
-    if (res.status === 200 && res.data) {
-      const temp = res.data.split(';')[0].split('=')
-      const weatherStr = temp[temp.length - 1]
-      const weather = JSON.parse(weatherStr)
-      if (weather.weatherinfo) {
-        return weather.weatherinfo
-      } else {
-        throw new Error('天气情况: 找不到weatherinfo属性, 获取失败')
-      }
-    } else {
-      throw new Error(res)
+    const url = `http://d1.weather.com.cn/dingzhi/${address}.html?_=${dayjs().valueOf()}`
+
+    const res = await axios.get(url, {
+        headers: {
+            'Referer': `http://www.weather.com.cn/weather1d/${address}.shtml`,
+            'User-Agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36`
+        }
+    }).catch(err => err)
+
+    try {
+        if (res.status === 200 && res.data) {
+            const temp = res.data.split(';')[0].split('=')
+            const weatherStr = temp[temp.length - 1]
+            const weather = JSON.parse(weatherStr)
+            if (weather.weatherinfo) {
+                return weather.weatherinfo
+            } else {
+                throw new Error('天气情况: 找不到weatherinfo属性, 获取失败')
+            }
+        } else {
+            throw new Error(res)
+        }
+    } catch (e) {
+        if (e instanceof SyntaxError) {
+            console.error('天气情况: 序列化错误', e)
+        } else {
+            console.error('天气情况: ', e)
+        }
+        return null
     }
-  } catch (e) {
-    if (e instanceof SyntaxError) {
-      console.error('天气情况: 序列化错误', e)
-    } else {
-      console.error('天气情况: ', e)
-    }
-    return null
-  }
 }
 
 /**
@@ -82,19 +81,19 @@ export const getWeather = async (province, city) => {
  * @returns
  */
 export const getCIBA = async () => {
-  const url = 'http://open.iciba.com/dsapi/'
-  const res = await axios.get(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-    }
-  }).catch(err => err)
+    const url = 'http://open.iciba.com/dsapi/'
+    const res = await axios.get(url, {
+        headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+        }
+    }).catch(err => err)
 
-  if (res.status === 200 && res) {
-    return res.data
-  }
-  console.error('金山词霸每日一句: 发生错误', res)
-  return null
+    if (res.status === 200 && res) {
+        return res.data
+    }
+    console.error('金山词霸每日一句: 发生错误', res)
+    return null
 }
 
 /**
@@ -104,18 +103,18 @@ export const getCIBA = async () => {
  */
 export const getOneTalk = async (type) => {
 
-  const filterQuery = TYPE_LIST.filter(item => item.name === type)
-  const query = filterQuery.length ? filterQuery[0].type : TYPE_LIST[randomNum(0, 7)].type
-  const url = `https://v1.hitokoto.cn/?c=${ query }`
+    const filterQuery = TYPE_LIST.filter(item => item.name === type)
+    const query = filterQuery.length ? filterQuery[0].type : TYPE_LIST[randomNum(0, 7)].type
+    const url = `https://v1.hitokoto.cn/?c=${query}`
 
-  const res = await axios.get(url).catch(err => err)
+    const res = await axios.get(url).catch(err => err)
 
-  if (res && res.status === 200) {
-    return res.data
-  }
+    if (res && res.status === 200) {
+        return res.data
+    }
 
-  console.error('每日一言: 发生错误', res)
-  return null
+    console.error('每日一言: 发生错误', res)
+    return null
 
 }
 /**
@@ -124,25 +123,25 @@ export const getOneTalk = async (type) => {
  * @returns {Promise<String>}
  */
 export const getWordsFromApiShadiao = async (type) => {
-  const typeNameMap = {
-    chp: '土味情话(彩虹屁)',
-    pyq: '朋友圈文案',
-    du: '毒鸡汤'
-  }
-  if (!['chp', 'pyq', 'du'].includes(type)) {
-    console.error('type参数有误，应为chp, pyq, du的其中一个')
-    return ''
-  }
-  const url = `https://api.shadiao.pro/${ type }`
-  try {
-    const res = await axios.get(url, {
-      responseType: 'json'
-    })
-    return res.data && res.data.data && res.data.data.text || ''
-  } catch (e) {
-    console.error(`${ typeNameMap[type] }：发生错误`, e)
-    return ''
-  }
+    const typeNameMap = {
+        chp: '土味情话(彩虹屁)',
+        pyq: '朋友圈文案',
+        du: '毒鸡汤'
+    }
+    if (!['chp', 'pyq', 'du'].includes(type)) {
+        console.error('type参数有误，应为chp, pyq, du的其中一个')
+        return ''
+    }
+    const url = `https://api.shadiao.pro/${type}`
+    try {
+        const res = await axios.get(url, {
+            responseType: 'json'
+        })
+        return res.data && res.data.data && res.data.data.text || ''
+    } catch (e) {
+        console.error(`${typeNameMap[type]}：发生错误`, e)
+        return ''
+    }
 }
 
 /**
@@ -150,7 +149,7 @@ export const getWordsFromApiShadiao = async (type) => {
  * @returns {Promise<String>} 土味情话(彩虹屁）内容
  */
 export const getEarthyLoveWords = async () => {
-  return await getWordsFromApiShadiao('chp')
+    return await getWordsFromApiShadiao('chp')
 }
 
 /**
@@ -158,7 +157,7 @@ export const getEarthyLoveWords = async () => {
  * @returns {Promise<String>} 朋友圈文案内容
  */
 export const getMomentCopyrighting = async () => {
-  return await getWordsFromApiShadiao('pyq')
+    return await getWordsFromApiShadiao('pyq')
 }
 
 /**
@@ -166,75 +165,90 @@ export const getMomentCopyrighting = async () => {
  * @returns {Promise<String>} 毒鸡汤内容
  */
 export const getPoisonChickenSoup = async () => {
-  return await getWordsFromApiShadiao('du')
+    return await getWordsFromApiShadiao('du')
+}
+
+
+function sleep(n) {
+    var start = new Date().getTime();
+    //  console.log('休眠前：' + start);
+    while (true) {
+        if (new Date().getTime() - start > n) {
+            break;
+        }
+    }
+    // console.log('休眠后：' + new Date().getTime());
 }
 
 /**
  * 获取重要节日信息
  * @returns
  */
-export const getBirthdayMessage = () => {
-  // 计算重要节日倒数
-  const birthdayList = sortBirthdayTime(config.FESTIVALS)
-  let resMessage = ''
+export const getBirthdayMessage = async () => {
+    // 计算重要节日倒数
+    const birthdayList = sortBirthdayTime(config.FESTIVALS)
+    let resMessage = ''
 
-  birthdayList.forEach((item, index) => {
-    if (
-      !config.FESTIVALS_LIMIT ||
-      (config.FESTIVALS_LIMIT && index < config.FESTIVALS_LIMIT)
-    ) {
-      let message = null
+    for (const item of birthdayList) {
+        let index = birthdayList.indexOf(item);
+        if (
+            !config.FESTIVALS_LIMIT ||
+            (config.FESTIVALS_LIMIT && index < config.FESTIVALS_LIMIT)
+        ) {
+            let message = null
 
-      // 生日相关
-      if (item.type === '生日') {
-        // 获取周岁
-        const age = dayjs().diff(item.year + '-' + item.date, 'year')
+            // 生日相关
+            if (item.type === '生日') {
+                // 获取周岁
+                const age = dayjs().diff(item.year + '-' + item.date, 'year')
 
-        if (item.diffDay === 0) {
-          message = `今天是 ${ item.name } 的${ age ? age + '岁' : '' }生日哦，祝${ item.name }生日快乐！`
-        } else {
-          message = `距离 ${ item.name } 的${ age ? age + 1 + '岁' : '' }生日还有${ item.diffDay }天`
+                if (item.diffDay === 0) {
+                    message = `今天是 ${item.name} 的${age ? age + '岁' : ''}生日哦，祝${item.name}生日快乐！`
+                } else {
+                    message = `距离 ${item.name} 的${age ? age + 1 + '岁' : ''}生日还有${item.diffDay}天`
+                }
+            }
+
+            // 节日相关
+            if (item.type === '节日') {
+                if (item.diffDay === 0) {
+                    message = `今天是 ${item.name} 哦，要开心！`
+                } else {
+                    message = `距离 ${item.name} 还有${item.diffDay}天`
+                }
+            }
+
+            // 退伍相关
+            if (item.type === '退伍') {
+                // 获取周岁
+                const age = dayjs().diff(item.year + '-' + item.date, 'year')
+
+                if (item.diffDay === 0) {
+                    message = `今天是 ${item.name} 退伍的${age ? age + '年' : ''}纪念日哦，祝${item.name}节日快乐！`
+                } else {
+                    message = `今天是 ${item.name} 退伍的第 ${Math.floor(((new Date().getTime() - new Date(item.year + '-' + item.date)) / 86400000))} 天,祖国有你！`
+                }
+            }
+
+            if (item.type === '双色球') {
+                let data = await getTwoColoBallData();
+                if (data !== null && data !== undefined) {
+                    const newData = getNewDateTwoColoBallData();
+                    message = `${data.time} 的双色球开奖号码是 ${data.openCode} ,今日幸运号码为 ${newData}, 下一个头等奖就是你！`
+                }
+            }
+
+            // 存储数据
+            if (message) {
+                resMessage += `${message} \n`
+            }
+
         }
-      }
-
-      // 节日相关
-      if (item.type === '节日') {
-        if (item.diffDay === 0) {
-          message = `今天是 ${ item.name } 哦，要开心！`
-        } else {
-          message = `距离 ${ item.name } 还有${ item.diffDay }天`
-        }
-      }
-
-      // 退伍相关
-      if (item.type === '退伍') {q
-        // 获取周岁
-        const age = dayjs().diff(item.year + '-' + item.date, 'year')
-
-        if (item.diffDay === 0) {
-          message = `今天是 ${ item.name } 退伍的${ age ? age + '年' : '' }纪念日哦，祝${ item.name }节日快乐！`
-        } else {
-          message = `今天是 ${ item.name } 退伍的第 ${Math.floor(((new Date().getTime() - new Date(item.year + '-' + item.date)) / 86400000))} 天,祖国有你！`
-        }
-      }
-
-      if(item.type === '双色球') {
-        if(getTwoColoBallData != null){
-          const data = getTwoColoBallData;
-          message = `${data.time} 的双色球开奖号码是 ${data.openCode} ,今日幸运号码为 ${getNewDateTwoColoBallData}, 下一个头等奖就是你！`
-        }
-      }
-
-      // 存储数据
-      if (message) {
-        resMessage += `${ message } \n`
-      }
 
     }
 
-  })
-
-  return resMessage
+    console.log(resMessage)
+    return resMessage
 }
 
 /**
@@ -242,29 +256,29 @@ export const getBirthdayMessage = () => {
  * @returns
  */
 export const getDateDiffList = () => {
-  const dateList = config.CUSTOMIZED_DATE_LIST
+    const dateList = config.CUSTOMIZED_DATE_LIST
 
-  dateList.forEach(item => {
-    item['diffDay'] = Math.floor(dayjs().diff(dayjs(item.date), 'day', true))
-  })
+    dateList.forEach(item => {
+        item['diffDay'] = Math.floor(dayjs().diff(dayjs(item.date), 'day', true))
+    })
 
-  return dateList
+    return dateList
 }
 
 export const getSlotList = () => {
-  const slotList = config.SLOT_LIST
+    const slotList = config.SLOT_LIST
 
-  slotList.forEach(item => {
-    if (Object.prototype.toString.call(item.contents) === '[object Array]' && item.contents.length > 0) {
-      item['checkout'] = item.contents[Math.floor(Math.random() * item.contents.length + 1) - 1]
-    } else if (Object.prototype.toString.call(item.contents) === '[object String]') {
-      item['checkout'] = item.contents
-    } else {
-      item['checkout'] = ''
-    }
-  })
+    slotList.forEach(item => {
+        if (Object.prototype.toString.call(item.contents) === '[object Array]' && item.contents.length > 0) {
+            item['checkout'] = item.contents[Math.floor(Math.random() * item.contents.length + 1) - 1]
+        } else if (Object.prototype.toString.call(item.contents) === '[object String]') {
+            item['checkout'] = item.contents
+        } else {
+            item['checkout'] = ''
+        }
+    })
 
-  return slotList
+    return slotList
 }
 
 /**
@@ -276,49 +290,49 @@ export const getSlotList = () => {
  * @returns
  */
 export const sendMessage = async (templateId, user, accessToken, params) => {
-  const url = `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${ accessToken }`
+    const url = `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${accessToken}`
 
-  const wxTemplateData = {}
-  if (Object.prototype.toString.call(params) === '[object Array]') {
-    params.map(item => {
-      wxTemplateData[item.name] = {
-        value: item.value,
-        color: item.color
-      }
-    })
-  }
-
-
-  // 组装数据
-  const data = {
-    "touser": user.id,
-    "template_id": templateId,
-    "url": user.openUrl || "https://wangxinleo.cn",
-    "topcolor": "#FF0000",
-    "data": wxTemplateData
-  }
-
-  // 发送消息
-  const res = await axios.post(url, data, {
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+    const wxTemplateData = {}
+    if (Object.prototype.toString.call(params) === '[object Array]') {
+        params.map(item => {
+            wxTemplateData[item.name] = {
+                value: item.value,
+                color: item.color
+            }
+        })
     }
-  }).catch(err => err)
 
 
-  if (res.data && res.data.errcode === 0) {
-    console.log('推送消息成功')
+    // 组装数据
+    const data = {
+        "touser": user.id,
+        "template_id": templateId,
+        "url": user.openUrl || "https://wangxinleo.cn",
+        "topcolor": "#FF0000",
+        "data": wxTemplateData
+    }
+
+    // 发送消息
+    const res = await axios.post(url, data, {
+        headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+        }
+    }).catch(err => err)
+
+
+    if (res.data && res.data.errcode === 0) {
+        console.log('推送消息成功')
+        return {
+            name: user.name,
+            success: true
+        }
+    }
+    console.error('推送失败！', res.data)
     return {
-      name: user.name,
-      success: true
+        name: user.name,
+        success: false
     }
-  }
-  console.error('推送失败！', res.data)
-  return {
-    name: user.name,
-    success: false
-  }
 }
 
 /**
@@ -330,36 +344,36 @@ export const sendMessage = async (templateId, user, accessToken, params) => {
  * @returns
  */
 export const sendMessageReply = async (users, accessToken, templateId = null, params = null) => {
-  const allPromise = []
-  const needPostNum = users.length
-  let successPostNum = 0
-  let failPostNum = 0
-  const successPostIds = []
-  const failPostIds = []
-  for (const user of users) {
-    allPromise.push(sendMessage(
-      templateId || user.useTemplateId,
-      user,
-      accessToken,
-      params || user.wxTemplateParams
-    ))
-  }
-  const resList = await Promise.all(allPromise)
-  resList.forEach(item => {
-    if (item.success) {
-      successPostNum++
-      successPostIds.push(item.name)
-    } else {
-      failPostNum++
-      failPostIds.push(item.name)
+    const allPromise = []
+    const needPostNum = users.length
+    let successPostNum = 0
+    let failPostNum = 0
+    const successPostIds = []
+    const failPostIds = []
+    for (const user of users) {
+        allPromise.push(sendMessage(
+            templateId || user.useTemplateId,
+            user,
+            accessToken,
+            params || user.wxTemplateParams
+        ))
     }
-  })
+    const resList = await Promise.all(allPromise)
+    resList.forEach(item => {
+        if (item.success) {
+            successPostNum++
+            successPostIds.push(item.name)
+        } else {
+            failPostNum++
+            failPostIds.push(item.name)
+        }
+    })
 
-  return {
-    needPostNum,
-    successPostNum,
-    failPostNum,
-    successPostIds: successPostIds.length ? successPostIds.join(',') : '无',
-    failPostIds: failPostIds.length ? failPostIds.join(',') : '无'
-  }
+    return {
+        needPostNum,
+        successPostNum,
+        failPostNum,
+        successPostIds: successPostIds.length ? successPostIds.join(',') : '无',
+        failPostIds: failPostIds.length ? failPostIds.join(',') : '无'
+    }
 }

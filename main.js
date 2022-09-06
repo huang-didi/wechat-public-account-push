@@ -38,7 +38,7 @@ const getAggregatedData = async () => {
     return { name: item.keyword, value: item.checkout, color: getColor() }
   })
   // 获取生日信息
-  const birthdayMessage = getBirthdayMessage()
+  const birthdayMessage = await getBirthdayMessage()
 
 
   const users = config.USERS

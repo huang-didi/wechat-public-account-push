@@ -29,23 +29,27 @@ export const getColor = () => {
  * 得到最近开奖号码
  */
 export const getTwoColoBallData = () => {
-    const appId = "sqnmugmnspqditkh";
-    const appSecret = "akw0SkhCOVoweWhWT3FQQ3dJNHgxUT09";
-    const code = "ssq";
-    axios.get('https://www.mxnzp.com/api/lottery/common/latest',
-        {
-            params: {
-                code: code,
-                app_id: appId,
-                app_secret: appSecret
-            }
+    return new Promise((resolve, reject) => {
+        setTimeout(() =>{
+            const appId = "sqnmugmnspqditkh";
+            const appSecret = "akw0SkhCOVoweWhWT3FQQ3dJNHgxUT09";
+            const code = "ssq";
+            axios.get('https://www.mxnzp.com/api/lottery/common/latest',
+                {
+                    params: {
+                        code: code,
+                        app_id: appId,
+                        app_secret: appSecret
+                    }
+                })
+                .then(function (res) {
+                    resolve(res.data.data);
+                })
+                .catch(function (error) {
+                    console.log(error)
+                })
         })
-        .then(function (res) {
-            return res;
-        })
-        .catch(function (error) {
-            console.log(error)
-        })
+    })
 }
 
 /**

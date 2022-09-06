@@ -17,7 +17,7 @@ const main = async () => {
     //     // 天气
     //     weather,
     //     // 最高温度
-    //     temp: maxTemperature, 
+    //     temp: maxTemperature,
     //     // 最低温度
     //     tempn: minTemperature,
     //     // 风向
@@ -34,8 +34,7 @@ const main = async () => {
     // 获取结婚的日期差
     // const marryDay = dayjs().diff(dayjs(config.MARRY_DATE), 'day')
     // 获取生日信息
-    const birthdayMessage = getBirthdayMessage()
-
+    const birthdayMessage = await getBirthdayMessage()
 
     // 集成所需信息
     const week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
